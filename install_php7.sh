@@ -4,6 +4,8 @@
 PREFIX="/usr/local/php7"
 CONF="$PREFIX/etc"
 TMP="/tmp/install_php7"
+USER="www"
+GROUP="www"
 
 echo_success() {
     word=$1
@@ -38,7 +40,7 @@ echo_success "Step 1: repart your system"
 
 yum -y install libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel gmp gmp-devel libmcrypt libmcrypt-devel readline readline-devel libxslt libxslt-devel
 
-if [ -d "$TMP" ] 
+if [ -d "$TMP" ]
 then
     echo_warning "clean up $TMP"
     if [ "x$TMP" != "x/" ]
@@ -73,9 +75,9 @@ fi
 
 echo_success "Step 4: compile:configure"
 cd php-7.1.2
-./configure --prefix=$PREFIX --with-config-file-path=$CONF --enable-fpm --with-fpm-user=deploy  --with-fpm-group=deploy --enable-inline-optimization --disable-debug --disable-rpath --enable-shared  --enable-soap --with-libxml-dir --with-xmlrpc --with-openssl --with-mcrypt --with-mhash --with-pcre-regex --with-sqlite3 --with-zlib --enable-bcmath --with-iconv --with-bz2 --enable-calendar --with-curl --with-cdb --enable-dom --enable-exif --enable-fileinfo --enable-filter --with-pcre-dir --enable-ftp --with-gd --with-openssl-dir --with-jpeg-dir --with-png-dir --with-zlib-dir  --with-freetype-dir --enable-gd-native-ttf --enable-gd-jis-conv --with-gettext --with-gmp --with-mhash --enable-json --enable-mbstring --enable-mbregex --enable-mbregex-backtrack --with-libmbfl --with-onig --enable-pdo --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-zlib-dir --with-pdo-sqlite --with-readline --enable-session --enable-shmop --enable-simplexml --enable-sockets  --enable-sysvmsg --enable-sysvsem --enable-sysvshm --enable-wddx --with-libxml-dir --with-xsl --enable-zip --enable-mysqlnd-compression-support --with-pear --enable-opcache
+./configure --prefix=$PREFIX --with-config-file-path=$CONF --enable-fpm --with-fpm-user=$USER  --with-fpm-group=$GROUP --enable-inline-optimization --disable-debug --disable-rpath --enable-shared  --enable-soap --with-libxml-dir --with-xmlrpc --with-openssl --with-mcrypt --with-mhash --with-pcre-regex --with-sqlite3 --with-zlib --enable-bcmath --with-iconv --with-bz2 --enable-calendar --with-curl --with-cdb --enable-dom --enable-exif --enable-fileinfo --enable-filter --with-pcre-dir --enable-ftp --with-gd --with-openssl-dir --with-jpeg-dir --with-png-dir --with-zlib-dir  --with-freetype-dir --enable-gd-native-ttf --enable-gd-jis-conv --with-gettext --with-gmp --with-mhash --enable-json --enable-mbstring --enable-mbregex --enable-mbregex-backtrack --with-libmbfl --with-onig --enable-pdo --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-zlib-dir --with-pdo-sqlite --with-readline --enable-session --enable-shmop --enable-simplexml --enable-sockets  --enable-sysvmsg --enable-sysvsem --enable-sysvshm --enable-wddx --with-libxml-dir --with-xsl --enable-zip --enable-mysqlnd-compression-support --with-pear --enable-opcache
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
     echo_failed "compile:configure failed, exiting..."
     exit 1
@@ -84,10 +86,13 @@ fi
 
 echo_success "Step 5: search your cpu core"
 core=`grep -c '^process' /proc/cpuinfo`
+echo_success "your have $core cpu core"
 if [ $core -gt 1 ]
 then
     let core=$core-1
 fi
+
+
 
 echo_success "Step 6: compile:make"
 make -j$core
