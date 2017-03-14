@@ -1,0 +1,152 @@
+#!/bin/bash
+# Jacky Xu, 2017-03-14
+
+PREFIX="/usr/local/php7"
+CONF="$PREFIX/etc"
+TMP="/tmp/install_php7"
+
+echo_success() {
+    word=$1
+    echo -e "\033[32m$word\e[m"
+}
+
+echo_failed() {
+    word=$1
+    echo -e "\033[31m$word\e[m"
+}
+
+echo_warning() {
+    word=$1
+    echo -e "\033[33m$word\e[m"
+}
+
+if [ $UID -ne 0 ]
+then
+    echo_failed "please run me as root"
+    exit 1
+fi
+
+echo_success "Starting Install PHP7 to $PREFIX"
+
+if [ -d "$PREFIX" ]
+then
+    echo_failed "$PREFIX existed, exiting..."
+    exit 1
+fi
+
+echo_success "Step 1: repart your system"
+
+yum -y install libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel gmp gmp-devel libmcrypt libmcrypt-devel readline readline-devel libxslt libxslt-devel
+
+if [ -d "$TMP" ] 
+then
+    echo_warning "clean up $TMP"
+    if [ "x$TMP" != "x/" ]
+    then
+        rm -rf $TMP
+    fi
+fi
+mkdir -p $TMP
+if [ $? -ne 0 ]
+then
+    echo_failed "can not create $TMP, exiting..."
+    exit 1
+fi
+cd $TMP
+
+echo_success "Step 2: download php7 from internet"
+wget -v "http://cn2.php.net/get/php-7.1.2.tar.gz/from/this/mirror" -O php-7.1.2.tar.gz
+
+if [ ! -f "php-7.1.2.tar.gz" ]
+then
+    echo_failed "download failed, exiting..."
+    exit 1
+fi
+
+echo_success "Step 3: uncompression php-7.1.2.tar.gz"
+tar -zxf php-7.1.2.tar.gz
+if [ $? -ne 0 ]
+then
+    echo_failed "tar -zxf php-7.1.2.tar.gz failed, exiting..."
+    exit 1
+fi
+
+echo_success "Step 4: compile:configure"
+cd php-7.1.2
+./configure --prefix=$PREFIX --with-config-file-path=$CONF --enable-fpm --with-fpm-user=deploy  --with-fpm-group=deploy --enable-inline-optimization --disable-debug --disable-rpath --enable-shared  --enable-soap --with-libxml-dir --with-xmlrpc --with-openssl --with-mcrypt --with-mhash --with-pcre-regex --with-sqlite3 --with-zlib --enable-bcmath --with-iconv --with-bz2 --enable-calendar --with-curl --with-cdb --enable-dom --enable-exif --enable-fileinfo --enable-filter --with-pcre-dir --enable-ftp --with-gd --with-openssl-dir --with-jpeg-dir --with-png-dir --with-zlib-dir  --with-freetype-dir --enable-gd-native-ttf --enable-gd-jis-conv --with-gettext --with-gmp --with-mhash --enable-json --enable-mbstring --enable-mbregex --enable-mbregex-backtrack --with-libmbfl --with-onig --enable-pdo --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-zlib-dir --with-pdo-sqlite --with-readline --enable-session --enable-shmop --enable-simplexml --enable-sockets  --enable-sysvmsg --enable-sysvsem --enable-sysvshm --enable-wddx --with-libxml-dir --with-xsl --enable-zip --enable-mysqlnd-compression-support --with-pear --enable-opcache
+
+if [ $? -ne 0 ] 
+then
+    echo_failed "compile:configure failed, exiting..."
+    exit 1
+fi
+
+
+echo_success "Step 5: search your cpu core"
+core=`grep -c '^process' /proc/cpuinfo`
+if [ $core -gt 1 ]
+then
+    let core=$core-1
+fi
+
+echo_success "Step 6: compile:make"
+make -j$core
+
+if [ $? -ne 0 ]
+then
+    echo_failed "compile:make failed, exiting..."
+    exit 1
+fi
+
+echo_success "Step 7: compile:make install"
+make install
+
+if [ $? -ne 0 ]
+then
+    echo_failed "compile:make failed, exiting..."
+    if [ -d "$PREFIX" ]
+    then
+        echo_failed "clean up $PREFIX"
+        if [ "x$PREFIX" != "x/" ]
+        then
+            rm -rf $PREFIX
+        fi
+    fi
+    exit 1
+fi
+
+if [ ! -d "$PREFIX" ]
+then
+    echo_failed "can not locate $PREFIX"
+    exit 1
+fi
+
+echo_success "Step 8: config php7"
+cp php.ini-production $CONF/php.ini && \
+cp $CONF/php-fpm.conf.default $CONF/php-fpm.conf && \
+cp $CONF/php-fpm.d/www.conf.default $CONF/php-fpm.d/www.conf && \
+cp sapi/fpm/init.d.php-fpm /etc/init.d/php7-fpm && \
+chmod +x /etc/init.d/php7-fpm
+
+if [ $? -ne 0 ]
+then
+    echo_success "config php7 failed, exiting..."
+    exit 1
+fi
+
+php_fpm=`netstat -lntp | grep '^tcp' | grep -c php-fpm`
+
+if [ $php_fpm -ne 0 ]
+then
+    echo_warning "find $php_fpm php-fpm tcp listen port, find max port num"
+    max=0
+    for i in `netstat -lntp | grep '^tcp' | grep php-fpm | awk '{print $4}' | cut -d ":" -f 2`
+    do
+        [ $i -gt $max ] && max=$i
+    done
+    let port=$max+1
+    echo_warning "php7-fpm will run at $port"
+    sed -i "s/^listen = .*/listen = 127\.0\.0\.1:$port/g" $CONF/php-fpm.d/www.conf
+fi
+
+echo_success "install finished, please run /etc/init.d/php7-fpm start"
