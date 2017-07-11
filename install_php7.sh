@@ -38,7 +38,12 @@ fi
 
 echo_success "Step 1: repart your system"
 
-yum -y install libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel gmp gmp-devel libmcrypt libmcrypt-devel readline readline-devel libxslt libxslt-devel
+if [ -f "/etc/redhat-release" ]
+then
+    yum -y install libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel gmp gmp-devel libmcrypt libmcrypt-devel readline readline-devel libxslt libxslt-devel
+else
+    apt-get -y install libxml2 libxml2-dev libssl1.0.0 libssl-dev bzip2 libbz2-dev libcurl3 libcurl4-openssl-dev libjpeg9 libjpeg9-dev libpng3 libpng12-dev libfreetype6 libfreetype6-dev libgmp10 libgmp-dev libmcrypt4 libmcrypt-dev libreadline6 libreadline6-dev libxslt1.1 libxslt1-dev pkg-config libssl-dev libsslcommon2-dev libpcre3 libpcre3-dev libgd-dev libgeoip-dev
+fi
 
 if [ -d "$TMP" ]
 then
@@ -155,3 +160,6 @@ then
 fi
 
 echo_success "install finished, please run /etc/init.d/php7-fpm start"
+
+#install php-redis
+#/usr/local/php7/bin/pecl install redis
