@@ -149,7 +149,7 @@ Options:
     -u [--user=]  :  MySQL User, Need Read Information_schema
     -p [--pass=]  :  User password
     -d [--db=]    :  Which db you need dump
-    -l [--lang=]  :  Column language[todo]
+    -l [--lang=]  :  Column language
     -o [--output=]:  file to save""")
     #print(break_line)
     print()
