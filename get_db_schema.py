@@ -144,9 +144,10 @@ def usage():
     print(first_line)
     print("""
 Options:
-    -h [--host=]  :  MySQL Host
+    -H [--host=]  :  MySQL Host
+    -P [--port=]  :  MySQL Port
     -u [--user=]  :  MySQL User, Need Read Information_schema
-    -u [--pass=]  :  User password
+    -p [--pass=]  :  User password
     -d [--db=]    :  Which db you need dump
     -l [--lang=]  :  Column language[todo]
     -o [--output=]:  file to save""")
