@@ -92,10 +92,10 @@ def get_opts():
     # Get opt
     try:
         # print(str(argv))
-        opts, args = getopt.getopt(argv[1:], 'h:P:u:p:d:l:o:', ['host=', 'port=', 'user=', 'pass=', 'db=', 'lang=', 'output='])
+        opts, args = getopt.getopt(argv[1:], 'hH:P:u:p:d:l:o:', ['help','host=', 'port=', 'user=', 'pass=', 'db=', 'lang=', 'output='])
         #print("debug " + str(opts))
         for key, value in opts:
-            if key in ['-h', '--host']:
+            if key in ['-H', '--host']:
                 opt['host'] = value
             if key in ['-P', '--port']:
                 opt['port'] = value
@@ -109,6 +109,9 @@ def get_opts():
                 opt['lang'] = value
             if key in ['-o', '--output']:
                 opt['output'] = value
+            if key in ['-h', '--help']:
+                usage()
+                exit(1)
     except getopt.GetoptError as e:
         error_msg(e.msg)
         exit(1)
