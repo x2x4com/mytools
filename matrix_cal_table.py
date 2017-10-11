@@ -71,6 +71,7 @@ def arg_parse():
     # choices : 选择
     # default : 默认值
     parser.add_argument("-a", "--amount", help="col/row amount", type=int)
+    parser.add_argument("-m", "--max", help="col + row < max", type=int)
     parser.add_argument("-c", "--column", help="column number ranger, example: 1-10")
     parser.add_argument("-r", "--row", help="row number ranger, example: 1-10")
     parser.add_argument("-o", "--output", help="output excel file name, default is random")
@@ -88,9 +89,13 @@ def arg_parse():
         parser.print_help()
         parser.exit("column not defined")
 
-    if args.row is None:
+    if args.row is None or not get_number(args.row, True):
         parser.print_help()
         parser.exit("row not defined")
+
+    if args.max is None:
+        parser.print_help()
+        parser.exit("max not defined")
 
     if args.output is None:
         args.output = "output" + get_tmp_file_name() + ".xlsx"
@@ -148,6 +153,8 @@ def run(args):
     sheet = wb.active
 
     row = 1
+    row_1_data = dict()
+    col_1_data = dict()
     while row <= (args.amount + 1):
         # print("第%s行, 共计%s行" % (row, (args.amount + 1)))
         if row == 1:
@@ -162,7 +169,9 @@ def run(args):
                     sheet.cell(row=row, column=col).border = border
                     col += 1
                     continue
-                sheet.cell(row=row, column=col).value = get_number(args.column)
+                num = get_number(args.column)
+                row_1_data[col] = num
+                sheet.cell(row=row, column=col).value = num
                 sheet.cell(row=row, column=col).font = font
                 sheet.cell(row=row, column=col).border = border
                 sheet.cell(row=row, column=col).alignment = center_alignment
@@ -172,7 +181,17 @@ def run(args):
             while col <= (args.amount + 1):
                 # print("第%s行, 第%s列, 共%s列" % (row, col, (args.amount + 1)))
                 if col == 1:
-                    sheet.cell(row=row, column=col).value = get_number(args.row)
+                    not_ok = True
+                    num = 0
+                    while not_ok:
+                        num = get_number(args.row)
+                        for row_data in row_1_data:
+                            if (num + row_data) > args.max:
+                                not_ok = True
+                            else:
+                                not_ok = False
+
+                    sheet.cell(row=row, column=col).value = num
                     sheet.cell(row=row, column=col).font = font
                     sheet.cell(row=row, column=col).border = border
                     sheet.cell(row=row, column=col).alignment = center_alignment
@@ -190,7 +209,6 @@ def run(args):
         sheet.column_dimensions[column_cells[0].column].width = cell_max_width
     print("save to %s" % args.output)
     wb.save(args.output)
-
 
 
 def main():
