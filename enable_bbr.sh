@@ -5,7 +5,7 @@ kernel_2=$(uname -r | cut -d '.' -f 2)
 common_sh='./common.sh'
 
 
-[if [ -r "$common_sh" ]
+if [ -r "$common_sh" ]
 then
     source $common_sh
 else
@@ -31,7 +31,7 @@ then
 fi
 
 
-[ $(lsmod | grep -c bbr) -eq 1 ] && modprobe tcp_bbr
+[ $(lsmod | grep -c bbr) -eq 0 ] && modprobe tcp_bbr
 if [ $(lsmod | grep -c bbr) -eq 0 ]
 then
     echo_failed "Can not enable mod tcp_bbr, please check"
