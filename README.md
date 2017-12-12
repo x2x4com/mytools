@@ -43,7 +43,7 @@ Options:
 
 Example:
 
-```
+```bash
 python3 get_db_schema.py -H 192.168.1.12 -u bidpoc -d bidpoc -p somepassword
 Port not define, use default, 3306
 Lang not define, use default, zhCN
@@ -60,3 +60,11 @@ save to db_schema_bidpoc_2017-09-08_172925.xlsx
 ## UpdateHook.py
 
 用于oschina的webhook回调，python版本
+
+依赖Flask，请先安装
+
+```bash
+pip install flask
+```
+
+
