@@ -1,15 +1,15 @@
 #!/bin/bash
 # Jacky Xu, 2017-03-14
 
-PREFIX="/usr/local/php7"
+PREFIX="/usr/local/nginx"
 CONF="$PREFIX/etc"
-TMP="/tmp/install_php7"
+TMP="/tmp/install_nginx"
 USER="www"
 GROUP="www"
-TARGET="PHP7"
-FILE="php-7.1.2.tar.gz"
-SOURCE_URL="http://cn2.php.net/get/php-7.1.2.tar.gz/from/this/mirror"
-SOURCE_DIR="php-7.1.2"
+TARGET="NGINX"
+FILE="nginx-1.13.7.tar.gz"
+SOURCE_URL="http://nginx.org/download/nginx-1.13.7.tar.gz"
+SOURCE_DIR="nginx-1.13.7"
 
 
 echo_success() {
@@ -67,7 +67,7 @@ fi
 cd $TMP
 
 echo_success "Step 2: download $TARGET from internet"
-wget -v "http://cn2.php.net/get/${FILE}/from/this/mirror" -O $FILE
+wget -v "$SOURCE_URL" -O $FILE
 
 if [ ! -f "$FILE" ]
 then
@@ -85,8 +85,7 @@ fi
 
 echo_success "Step 4: compile:configure"
 cd $SOURCE_DIR
-./configure --prefix=$PREFIX --with-config-file-path=$CONF --enable-fpm --with-fpm-user=$USER  --with-fpm-group=$GROUP --enable-inline-optimization --disable-debug --disable-rpath --enable-shared  --enable-soap --with-libxml-dir --with-xmlrpc --with-openssl --with-mcrypt --with-mhash --with-pcre-regex --with-sqlite3 --with-zlib --enable-bcmath --with-iconv --with-bz2 --enable-calendar --with-curl --with-cdb --enable-dom --enable-exif --enable-fileinfo --enable-filter --with-pcre-dir --enable-ftp --with-gd --with-openssl-dir --with-jpeg-dir --with-png-dir --with-zlib-dir  --with-freetype-dir --enable-gd-native-ttf --enable-gd-jis-conv --with-gettext --with-gmp --with-mhash --enable-json --enable-mbstring --enable-mbregex --enable-mbregex-backtrack --with-libmbfl --with-onig --enable-pdo --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-zlib-dir --with-pdo-sqlite --with-readline --enable-session --enable-shmop --enable-simplexml --enable-sockets  --enable-sysvmsg --enable-sysvsem --enable-sysvshm --enable-wddx --with-libxml-dir --with-xsl --enable-zip --enable-mysqlnd-compression-support --with-pear --enable-opcache
-
+./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_ssl_module
 if [ $? -ne 0 ]
 then
     echo_failed "compile:configure failed, exiting..."
@@ -136,35 +135,8 @@ then
     exit 1
 fi
 
-echo_success "Step 8: config $TARGET"
-cp php.ini-production $CONF/php.ini && \
-cp $CONF/php-fpm.conf.default $CONF/php-fpm.conf && \
-cp $CONF/php-fpm.d/www.conf.default $CONF/php-fpm.d/www.conf && \
-cp sapi/fpm/init.d.php-fpm /etc/init.d/php7-fpm && \
-chmod +x /etc/init.d/php7-fpm
 
-if [ $? -ne 0 ]
-then
-    echo_success "config $TARGET failed, exiting..."
-    exit 1
-fi
-
-php_fpm=`netstat -lntp | grep '^tcp' | grep -c php-fpm`
-
-if [ $php_fpm -ne 0 ]
-then
-    echo_warning "find $php_fpm php-fpm tcp listen port, find max port num"
-    max=0
-    for i in `netstat -lntp | grep '^tcp' | grep php-fpm | awk '{print $4}' | cut -d ":" -f 2`
-    do
-        [ $i -gt $max ] && max=$i
-    done
-    let port=$max+1
-    echo_warning "php7-fpm will run at $port"
-    sed -i "s/^listen = .*/listen = 127\.0\.0\.1:$port/g" $CONF/php-fpm.d/www.conf
-fi
-
-echo_success "install finished, please run /etc/init.d/php7-fpm start"
+echo_success "install finished"
 
 #install php-redis
 #/usr/local/php7/bin/pecl install redis
