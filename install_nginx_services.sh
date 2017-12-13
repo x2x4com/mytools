@@ -10,7 +10,7 @@ nginx_root="/usr/local/nginx"
 [ ! -f "./conf/nginx/$target" ] && echo "Can not find ./conf/nginx/$target" && exit 1
 [ ! -d "$bk_home" ] && sudo mkdir -p $bk_home
 [ -f "$systemd_dir/$target" ] && sudo mv $systemd_dir/$target $bk_home/${target}.$bk
-sudo cp $target $systemd_dir/$target
+sudo cp ./conf/nginx/$target $systemd_dir/$target
 sudo systemctl enable nginx
 sudo systemctl status nginx
 
