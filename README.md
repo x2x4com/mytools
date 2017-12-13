@@ -1,6 +1,19 @@
-#我的工具集
+# 我的工具集
 
 自己的一些常用工具
+
+## install_nginx.sh
+
+CentOS/Ubuntu 上编译安装NGINX
+
+```
+source <(curl -fsSL http://git.oschina.net/x2x4/mytools/raw/master/install_nginx.sh)
+```
+
+## install_nginx_service.sh
+
+为系统配置基于systemctl的nginx启动文件，请克隆仓库后执行
+
 
 ## install_php7.sh
 
