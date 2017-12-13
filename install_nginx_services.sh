@@ -1,7 +1,7 @@
 #!/bin/bash
 
 bk_home='/data/backup/nginx'
-target='nginx.service'
+target='./conf/nginx/nginx.service'
 systemd_dir='/lib/systemd/system'
 bk=$(date '+%Y%m%d_%H%M%S%N')
 nginx_root="/usr/local/nginx"
