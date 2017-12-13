@@ -22,4 +22,4 @@ vhosts="$conf/vhosts"
 cp ./conf/nginx/nginx.conf $conf/nginx.conf
 [ ! -f "$vhots/www.conf" ] && cp ./conf/nginx/www.conf $vhosts/www.conf
 
-echo "DONE"
+echo "DONE, Please modify $vhosts/www.conf |DOMAIN| to your domain and |SITE| to your site root"
