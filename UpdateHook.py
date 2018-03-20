@@ -249,4 +249,4 @@ def check_git_dir(target):
 
 
 if __name__ == '__main__':
-    app.run(host=listen, port=port, processes=processes, debug=debug)
+    app.run(host=listen, port=port, processes=processes, debug=debug, threaded=True)
