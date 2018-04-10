@@ -110,6 +110,7 @@ def check_redis(args):
     sentinel_ip = None
     sentinel_port = None
     sentinel = None
+    redis_db = None
     if _sentinel:
         try:
             (sentinel_ip,sentinel_port) = _sentinel.split(':')
@@ -118,41 +119,60 @@ def check_redis(args):
             color.yellow("Sentinel format error, must ip/domain:port skip")
             sentinel_ip = None
             sentinel_port = None
+
+
     color.cyan("Start to connect Redis Service")
     color.cyan("Host: %s, Port: %s, User: %s, Passwd: %s, Sentinel: %s:%s" % (host, port, user, hidden_pass, sentinel_ip, sentinel_port))
-    redis_db = redis.Redis(host=host, port=port, db=9, socket_timeout=10)
-    try:
-        db_info = redis_db.info()
-        # print(db_info)
-    except Exception as e:
-        color.red(str(e))
-        exit(1)
+
     if _sentinel:
         color.cyan("Try to get master from sentinel, ", end="")
         (master_ip, master_port) = redis_get_master(_sentinel, sentinel_ip, sentinel_port)
         color.cyan("Master_IP: %s, Master_Port: %s" %(master_ip, master_port))
+        if master_ip is not None and master_port is not None:
+            redis_db = redis.Redis(host=master_ip, port=master_port, db=9, socket_timeout=0.1)
+        #else:
+        #    redis_db = redis.Redis(host=host, port=port, db=9, socket_timeout=0.1)
+    else:
+        redis_db = redis.Redis(host=host, port=port, db=9, socket_timeout=0.1)
+
+    #try:
+    #    db_info = redis_db.info()
+    #    # print(db_info)
+    #except Exception as e:
+    #    color.red(str(e))
+    #    exit(1)
+
     loop = False
     if test: loop = True
-    color.cyan("Try to do test set and get, ", end="")
-    redis_test(redis_db)
-    print()
+    if not _sentinel:
+        color.cyan("Try to do test set and get, ", end="")
+        redis_test(redis_db)
+        print()
+    else:
+        color.cyan("Try to do loop test: ")
     count = 1
     time.sleep(2)
     try:
         while loop:
             color.cyan("%s: %s, " % (count, time.strftime("%H:%M:%S",time.localtime(int(time.time())))), end="")
             color.cyan("Set/Get: ", end="")
-            redis_test(redis_db)
             if _sentinel:
-                color.cyan(", Master:", end="")
                 (master_ip, master_port) = redis_get_master(_sentinel, sentinel_ip, sentinel_port)
-                color.cyan(" %s:%s" % (master_ip, master_port), end="")
+                if master_ip is not None and master_port is not None:
+                    redis_db = redis.Redis(host=master_ip, port=master_port, db=9, socket_timeout=0.1)
+                    redis_test(redis_db)
+                    color.cyan(", Master:", end="")
+                    color.cyan(" %s:%s" % (master_ip, master_port), end="")
+                else:
+                    color.red(" Failed", end="")
+            else:
+                redis_test(redis_db)
             print()
             count += 1
             time.sleep(2)
     except KeyboardInterrupt:
         color.yellow("\nKeyboard interrupt")
-    redis_db.delete("ops:test")
+    #redis_db.delete("ops:test")
     color.cyan("Done")
 
 
