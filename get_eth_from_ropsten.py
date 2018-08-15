@@ -43,7 +43,7 @@ url = 'http://faucet.ropsten.be:3001/donate/%s' % address
 
 while True:
     print('{time} UTC, New looping start'.format(time=str(datetime.utcnow())))
-    sleep_time = 1
+    sleep_time = 10000
     try:
         req = request.urlopen(url)
         code = req.code
@@ -53,14 +53,19 @@ while True:
         code = e.code
         msg = e.msg
         rt = e.fp.read()
+        if type(rt) == bytes:
+            rt = rt.decode()
         print('Request done, code: %s, msg: %s, rt: %s' % (code, msg, rt))
         try:
             rt = json.loads(rt)
-            sleep_time = rt['duration'] / 1000
-        except:
-            sleep_time = 10
-    except:
-        sleep_time = 10
+            sleep_time = rt['duration']
+        except Exception as e:
+            print('Unknow error')
+            print(e)
+    except Exception as e:
+        print('Unknow error')
+        print(e)
+    sleep_time = sleep_time / 1000.0
     print('sleep %s' % sleep_time)
     sleep(sleep_time)
 
