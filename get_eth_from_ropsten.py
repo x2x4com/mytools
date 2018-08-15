@@ -21,10 +21,10 @@
 
 try:
     from urllib import request
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 except ImportError:
     import urllib2 as request
-    from urllib2 import HTTPError
+    from urllib2 import HTTPError, URLError
 
 
 from sys import argv, exit
@@ -59,6 +59,8 @@ while True:
             sleep_time = rt['duration'] / 1000
         except:
             sleep_time = 10
+    except:
+        sleep_time = 10
     print('sleep %s' % sleep_time)
     sleep(sleep_time)
 
