@@ -45,7 +45,7 @@ while True:
     print('{time} UTC, New looping start'.format(time=str(datetime.utcnow())))
     sleep_time = 10000
     try:
-        req = request.urlopen(url)
+        req = request.urlopen(url, timeout=10)
         code = req.code
         rt = req.read()
         print('Request done, code: %s, rt: %s' % (code, rt))
