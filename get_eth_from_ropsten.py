@@ -65,6 +65,7 @@ while True:
     except Exception as e:
         print('Unknow error')
         print(e)
+    if sleep_time < 0: sleep_time = 0
     sleep_time = sleep_time / 1000.0
     print('sleep %s' % sleep_time)
     sleep(sleep_time)
