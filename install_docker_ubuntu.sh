@@ -6,7 +6,7 @@ sudo apt-get -y remove docker docker-engine docker.io ; \
 sudo apt-get update && \
 sudo apt-get -y install \
     python3-pip python3-dev \
-    libffi-dev openssl-dev gcc libc-dev \
+    libffi-dev libssl-dev gcc libc-dev \
     apt-transport-https \
     ca-certificates \
     curl \
