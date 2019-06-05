@@ -5,6 +5,8 @@
 sudo apt-get -y remove docker docker-engine docker.io ; \
 sudo apt-get update && \
 sudo apt-get -y install \
+    python3-pip python3-dev
+    libffi-dev openssl-dev gcc libc-dev \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -20,4 +22,12 @@ sudo add-apt-repository \
    $(lsb_release -cs) \
    stable" && \
 sudo apt-get update && \
-sudo apt-get -y install docker-ce docker-compose
+sudo apt-get -y install docker-ce && \
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+sudo chmod +x /usr/local/bin/docker-compose && \
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && \
+sudo usermod -a -G docker $(whoami) && \
+docker version && \
+echo "Docker Compose Version:" && 
+
+
