@@ -9,8 +9,6 @@ err_exit() {
     exit $1
 }
 
-
-
 install_ubuntu() {
     apt-get -y remove docker docker-engine docker.io
     apt-get update && \
@@ -48,6 +46,12 @@ install_compose() {
         then
             err_exit $? "Download docker compose failed"
         fi
+        cd /tmp && sha256sum --status -c docker-compose-Linux-x86_64.sha256
+        if [ $? -ne 0 ]
+        then
+            err_exit $? "sha256sum docker-compose-Linux-x86_64 failed"
+        fi
+        cd -
         [[ -f '/usr/local/bin/docker-compose' ]] && rm -r /usr/local/bin/docker-compose
         [[ -L '/usr/bin/docker-compose' ]] && rm -r /usr/bin/docker-compose
         mv /tmp/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose && \
