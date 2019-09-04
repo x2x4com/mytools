@@ -1,10 +1,17 @@
 #!/bin/bash
 
+[[ $UID -ne 0 ]] && echo "Require root permission" && exit 1
 
+docker_install_success=1
 
-sudo apt-get -y remove docker docker-engine docker.io ; \
-sudo apt-get update && \
-sudo apt-get -y install \
+err_exit() {
+    echo $2
+    exit $1
+}
+
+apt-get -y remove docker docker-engine docker.io
+apt-get update && \
+apt-get -y install jq \
     python3-pip python3-dev \
     libffi-dev libssl-dev gcc libc-dev \
     apt-transport-https \
@@ -17,17 +24,32 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && 
 #      Key fingerprint = 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
 # uid                  Docker Release (CE deb) <docker@docker.com>
 # sub   4096R/F273FCD8 2017-02-22
-sudo add-apt-repository \
+add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable" && \
-sudo apt-get update && \
-sudo apt-get -y install docker-ce && \
-sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
-sudo chmod +x /usr/local/bin/docker-compose && \
-sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && \
-sudo usermod -a -G docker $(whoami) && \
-docker version && \
-echo "Docker Compose Version:" && docker-compose --version
-
+apt-get update && \
+apt-get -y install docker-ce && docker_install_success=0
+if [ ${docker_install_success} -eq 0 ]
+then
+    docker_compose_releases=$(curl -s https://api.github.com/repos/docker/compose/releases)
+    latest_stable_compose=$(echo ${docker_compose_releases} | jq '[.[] | select(.prerelease==false)]' | jq .[0])
+    linux_release=$(echo $latest_stable_compose | jq -r '.assets[] | select(.name=="docker-compose-Linux-x86_64") | .browser_download_url')
+    linux_release_sha256=$(echo $latest_stable_compose | jq -r '.assets[] | select(.name=="docker-compose-Linux-x86_64.sha256") | .browser_download_url')
+    curl -L "${linux_release}" -o /tmp/docker-compose-Linux-x86_64 && \
+    curl -L "${linux_release_sha256}" -o /tmp/docker-compose-Linux-x86_64.sha256
+    if [ $? -ne 0 ]
+    then
+        err_exit $? "Download docker compose failed"
+    fi
+    [[ -f '/usr/local/bin/docker-compose' ]] && rm -r /usr/local/bin/docker-compose
+    mv /tmp/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose && \
+    chmod +x  /usr/local/bin/docker-compose && \
+    ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && \
+    usermod -a -G docker $(whoami) && \
+    docker version && \
+    echo "Docker Compose Version:" && docker-compose --version
+else
+    echo "Docker CE install failed"
+fi
 
