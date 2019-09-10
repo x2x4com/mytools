@@ -9,6 +9,20 @@ err_exit() {
     exit $1
 }
 
+install_centos() {
+    yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine -y
+    yum install -y yum-utils device-mapper-persistent-data lvm2 && \
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    yum install docker-ce docker-ce-cli containerd.io && docker_install_success=0 
+}
+
 install_ubuntu() {
     apt-get -y remove docker docker-engine docker.io
     apt-get update && \
@@ -51,22 +65,37 @@ install_compose() {
         then
             err_exit $? "sha256sum docker-compose-Linux-x86_64 failed"
         fi
-        cd -
         [[ -f '/usr/local/bin/docker-compose' ]] && rm -r /usr/local/bin/docker-compose
         [[ -L '/usr/bin/docker-compose' ]] && rm -r /usr/bin/docker-compose
         mv /tmp/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose && \
         chmod +x  /usr/local/bin/docker-compose && \
         ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && \
-        usermod -a -G docker $(whoami) && \
         docker version && \
         echo "Docker Compose Version:" && docker-compose --version
+        echo "Please run 'sudo usermod -a -G docker [your username]'"
     else
         echo "Docker CE install failed"
     fi
 }
 
 install_docker() {
-    install_ubuntu
+    kernel_release=$(uname -r | cut -d '.' -f 1)
+    kernel_release_2=$(uname -r | cut -d '.' -f 2)
+    [[ "x${kernel_release}" == "x" ]] && err_exit 1 "Can not get kernel info"
+    [[ "x${kernel_release_2}" == "x" ]] && err_exit 1 "Can not get kernel info"
+    [[ $kernel_release -lt 3 ]] && err_exit 1 "Kernel need >= 3.10"
+    if [[ $kernel_release -eq 3 ]]
+    then
+        [[ $kernel_release_2 -lt 10 ]] && err_exit 1 "Kernel need >= 3.10"
+    fi
+    if [[ -f '/etc/redhat-release' ]]
+    then
+        install_centos
+    elif [[ -f '/etc/lsb-release' ]] 
+        install_ubuntu
+    else
+        err_exit 1 "Your OS not support"
+    
 }
 
 install_docker
