@@ -95,7 +95,7 @@ install_docker() {
         install_ubuntu
     else
         err_exit 1 "Your OS not support"
-    
+    fi
 }
 
 install_docker
