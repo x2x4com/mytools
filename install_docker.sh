@@ -20,11 +20,11 @@ install_centos() {
                   docker-engine -y
     yum install -y yum-utils device-mapper-persistent-data lvm2 jq && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
-    yum install docker-ce docker-ce-cli containerd.io && docker_install_success=0 
+    yum install docker-ce docker-ce-cli containerd.io -y && docker_install_success=0 
 }
 
 install_ubuntu() {
-    apt-get -y remove docker docker-engine docker.io
+    apt-get -y remove docker docker-engine docker.io containerd.io
     apt-get update && \
     apt-get -y install jq \
         python3-pip python3-dev \
