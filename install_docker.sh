@@ -92,6 +92,7 @@ install_docker() {
     then
         install_centos
     elif [[ -f '/etc/lsb-release' ]] 
+    then
         install_ubuntu
     else
         err_exit 1 "Your OS not support"
