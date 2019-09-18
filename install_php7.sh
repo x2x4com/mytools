@@ -7,9 +7,9 @@ TMP="/tmp/install_php7"
 USER="www"
 GROUP="www"
 TARGET="PHP7"
-FILE="php-7.1.18.tar.gz"
-SOURCE_URL="http://cn2.php.net/get/php-7.1.18.tar.gz/from/this/mirror"
-SOURCE_DIR="php-7.1.18"
+FILE="php-7.1.32.tar.gz"
+SOURCE_URL="https://www.php.net/distributions/php-7.1.32.tar.gz"
+SOURCE_DIR="php-7.1.32"
 
 
 echo_success() {
@@ -66,14 +66,20 @@ then
 fi
 cd $TMP
 
-echo_success "Step 2: download $TARGET from internet"
-wget -v "http://cn2.php.net/get/${FILE}/from/this/mirror" -O $FILE
-
-if [ ! -f "$FILE" ]
+if [ ! -f $FILE ]
 then
-    echo_failed "download failed, exiting..."
-    exit 1
+    echo_success "Step 2: download $TARGET from internet"
+    wget -v "${SOURCE_URL}" -O $FILE
+
+    if [ ! -f "$FILE" ]
+    then
+        echo_failed "download failed, exiting..."
+        exit 1
+    fi
+else
+    echo_success "Step 2: find $TARGET locally"
 fi
+
 
 echo_success "Step 3: uncompression $FILE"
 tar -zxf $FILE
