@@ -7,9 +7,9 @@ TMP="/tmp/install_nginx"
 USER="www"
 GROUP="www"
 TARGET="NGINX"
-FILE="nginx-1.13.7.tar.gz"
-SOURCE_URL="http://nginx.org/download/nginx-1.13.7.tar.gz"
-SOURCE_DIR="nginx-1.13.7"
+FILE="nginx-1.17.3.tar.gz"
+SOURCE_URL="http://nginx.org/download/nginx-1.17.3.tar.gz"
+SOURCE_DIR="nginx-1.17.3"
 
 
 echo_success() {

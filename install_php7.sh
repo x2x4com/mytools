@@ -7,9 +7,9 @@ TMP="/tmp/install_php7"
 USER="www"
 GROUP="www"
 TARGET="PHP7"
-FILE="php-7.1.2.tar.gz"
-SOURCE_URL="http://cn2.php.net/get/php-7.1.2.tar.gz/from/this/mirror"
-SOURCE_DIR="php-7.1.2"
+FILE="php-7.1.18.tar.gz"
+SOURCE_URL="http://cn2.php.net/get/php-7.1.18.tar.gz/from/this/mirror"
+SOURCE_DIR="php-7.1.18"
 
 
 echo_success() {
