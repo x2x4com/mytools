@@ -50,20 +50,15 @@ else
     apt-get -y install libxml2 libxml2-dev libssl1.0.0 libssl-dev bzip2 libbz2-dev libcurl3 libcurl4-openssl-dev libjpeg9 libjpeg9-dev libpng3 libpng12-dev libfreetype6 libfreetype6-dev libgmp10 libgmp-dev libmcrypt4 libmcrypt-dev libreadline6 libreadline6-dev libxslt1.1 libxslt1-dev pkg-config libssl-dev libsslcommon2-dev libpcre3 libpcre3-dev libgd-dev libgeoip-dev
 fi
 
-if [ -d "$TMP" ]
-then
-    echo_warning "clean up $TMP"
-    if [ "x$TMP" != "x/" ]
-    then
-        rm -rf $TMP
-    fi
-fi
-mkdir -p $TMP
-if [ $? -ne 0 ]
-then
-    echo_failed "can not create $TMP, exiting..."
-    exit 1
-fi
+# if [ -d "$TMP" ]
+# then
+#     echo_warning "clean up $TMP"
+#     if [ "x$TMP" != "x/" ]
+#     then
+#         rm -rf $TMP
+#     fi
+# fi
+[[ ! -d "${TMP}" ]] && mkdir -p $TMP && [[ $? -ne 0 ]] && echo_failed "can not create $TMP, exiting..." && exit 1
 cd $TMP
 
 if [ ! -f $FILE ]
