@@ -2,6 +2,14 @@
 
 自己的一些常用工具
 
+## install_docker.sh
+
+在Centos7 or ubuntu上安装docker
+
+```
+curl -sSL https://gitee.com/x2x4/mytools/raw/master/install_docker.sh | sudo bash
+```
+
 ## install_nginx.sh
 
 CentOS/Ubuntu 上编译安装NGINX
