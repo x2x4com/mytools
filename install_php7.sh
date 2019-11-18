@@ -7,9 +7,10 @@ TMP="/tmp/install_php7"
 USER="www"
 GROUP="www"
 TARGET="PHP7"
-FILE="php-7.1.32.tar.gz"
-SOURCE_URL="https://gitee.com/x2x4/mytools/raw/master/src/php-7.1.32.targz"
-SOURCE_DIR="php-7.1.32"
+FILE="php-7.1.33.tar.gz"
+# SOURCE_URL="https://gitee.com/x2x4/mytools/raw/master/src/php-7.1.32.targz"
+SOURCE_URL="https://www.php.net/distributions/php-7.1.33.tar.gz"
+SOURCE_DIR="php-7.1.33"
 
 
 echo_success() {
