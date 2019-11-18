@@ -2,12 +2,20 @@
 
 自己的一些常用工具
 
+## install_docker.sh
+
+在Centos7 or ubuntu上安装docker
+
+```
+curl -sSL https://gitee.com/x2x4/mytools/raw/master/install_docker.sh | sudo bash
+```
+
 ## install_nginx.sh
 
 CentOS/Ubuntu 上编译安装NGINX
 
 ```
-source <(curl -fsSL http://git.oschina.net/x2x4/mytools/raw/master/install_nginx.sh)
+curl -fsSL http://git.oschina.net/x2x4/mytools/raw/master/install_nginx.sh | sudo bash
 ```
 
 ## install_nginx_service.sh
@@ -21,7 +29,7 @@ CentOS/Ubuntu 编译安装PHP7.1.2
 
 
 ```
-source <(curl -fsSL http://git.oschina.net/x2x4/mytools/raw/master/install_php7.sh) 
+curl -fsSL http://git.oschina.net/x2x4/mytools/raw/master/install_php7.sh | sudo bash
 ```
 
 ## get_db_schema.py
