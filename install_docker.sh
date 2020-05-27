@@ -18,10 +18,9 @@ install_centos() {
                   docker-latest-logrotate \
                   docker-logrotate \
                   docker-engine -y
-    yum install -y yum-utils device-mapper-persistent-data lvm2 epel-release && \
-    yum install -y jq && \
+    yum install -y yum-utils device-mapper-persistent-data lvm2 epel-release jq && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
-    yum install docker-ce docker-ce-cli containerd.io -y && docker_install_success=0 
+    yum install containerd.io docker-ce docker-ce-cli -y && docker_install_success=0 
 }
 
 install_ubuntu() {
@@ -101,4 +100,4 @@ install_docker() {
 }
 
 install_docker
-install_compose
+# install_compose
